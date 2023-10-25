@@ -13,7 +13,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/ybkuroki/go-webapp-project-template/config"
+	"synapso/config"
 )
 
 var logger *Logger

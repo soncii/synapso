@@ -2,8 +2,10 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
+	"regexp"
+	"synapso/repository"
 
-	"github.com/ybkuroki/go-webapp-project-template/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -12,12 +14,85 @@ type User struct {
 	ID           uint   `gorm:"primary_key" json:"id"`
 	FirstName    string `json:"name"`
 	Surname      string `json:"surname"`
-	Email        string `json:"email"`
+	Email        string `json:"email" gorm:"unique"`
 	MobileNumber string `json:"mobile_number"`
 	Gender       string `json:"gender"`
 	DateOfBirth  string `json:"date_of_birth"`
 	Password     string `json:"-"`
 	Role         string `json:"role"`
+}
+
+type UserCreate struct {
+	FirstName    string `json:"name"`
+	Surname      string `json:"surname"`
+	Email        string `json:"email"`
+	MobileNumber string `json:"mobile_number"`
+	Gender       string `json:"gender"`
+	DateOfBirth  string `json:"date_of_birth"`
+	Password     string `json:"password"`
+	Role         string `json:"role"`
+}
+
+func (u UserCreate) ToModel() User {
+	return User{
+		FirstName:    u.FirstName,
+		Surname:      u.Surname,
+		Email:        u.Email,
+		MobileNumber: u.MobileNumber,
+		Gender:       u.Gender,
+		DateOfBirth:  u.DateOfBirth,
+		Password:     string(HashPassword(u.Password)),
+		Role:         u.Role,
+	}
+}
+
+func (u UserCreate) Validate() (bool, error) {
+	if u.FirstName == "" {
+		return false, fmt.Errorf("First name is required")
+	}
+
+	if u.Surname == "" {
+		return false, fmt.Errorf("Surname is required")
+	}
+
+	if u.Email == "" {
+		return false, fmt.Errorf("Email is required")
+	}
+
+	// Validate email format (basic regex pattern)
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	if !emailRegex.MatchString(u.Email) {
+		return false, fmt.Errorf("Invalid email format")
+	}
+
+	if u.MobileNumber == "" {
+		return false, fmt.Errorf("Mobile number is required")
+	}
+
+	// You can add more specific validation rules for mobile numbers
+
+	if u.Gender == "" {
+		return false, fmt.Errorf("Gender is required")
+	}
+
+	dateOfBirthRegex := regexp.MustCompile(`^\d{2}\.\d{2}\.\d{4}$`)
+	if !dateOfBirthRegex.MatchString(u.DateOfBirth) {
+		return false, fmt.Errorf("Invalid date of birth format (DD.MM.YYYY)")
+	}
+
+	if u.Password == "" {
+		return false, fmt.Errorf("Password is required")
+	}
+
+	if len(u.Password) < 6 {
+		return false, fmt.Errorf("Password must be at least 6 characters")
+	}
+
+	if u.Role != "researcher" && u.Role != "subject" {
+		return false, fmt.Errorf("Invalid role")
+	}
+
+	return true, nil
 }
 
 // TableName returns the table name of User struct and it is used by gorm.
@@ -32,9 +107,10 @@ func HashPassword(password string) []byte {
 }
 
 // FindByName returns Users full matched given User name.
-func (a *User) FindByEmail(rep *repository.Repository, email string) (user *User, err error) {
-	err = rep.Preload("Authority").Where("email = ?", email).Find(user).Error
-	return
+func (a *User) FindByEmail(rep *repository.Repository, email string) (*User, error) {
+	var user User
+	err := rep.Where("email = ?", email).First(&user).Error
+	return &user, err
 }
 
 // Create persists this User data.

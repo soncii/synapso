@@ -1,10 +1,11 @@
 package service
 
 import (
-	"github.com/ybkuroki/go-webapp-project-template/logger"
-	"github.com/ybkuroki/go-webapp-project-template/model"
-	"github.com/ybkuroki/go-webapp-project-template/repository"
+	"context"
 	"golang.org/x/crypto/bcrypt"
+	"synapso/logger"
+	"synapso/model"
+	"synapso/repository"
 )
 
 // AuthenticateByUsernameAndPassword authenticates by using username and plain text password.
@@ -23,4 +24,15 @@ func AuthenticateByUsernameAndPassword(username string, password string) (bool, 
 	}
 
 	return true, result
+}
+
+func SignUpUser(ctx context.Context, user model.User) (*model.User, error) {
+	rep := repository.GetRepository()
+	result, err := user.Create(rep)
+	if err != nil {
+		logger.GetEchoLogger().Error(err)
+		return nil, err
+	}
+
+	return result, nil
 }

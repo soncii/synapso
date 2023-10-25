@@ -1,6 +1,6 @@
 package enums
 
 const (
-	researcher string = "researcher"
-	subject    string = "subject"
+	RESEARCHER string = "researcher"
+	SUBJECT    string = "subject"
 )

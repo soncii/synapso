@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"synapso/logger"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,16 +13,13 @@ type APIError struct {
 	Message string
 }
 
-// JSONErrorHandler is cumstomize error handler
+// JSONErrorHandler is customize error handler
 func JSONErrorHandler(err error, c echo.Context) {
 	code := http.StatusInternalServerError
-	msg := http.StatusText(code)
-
+	msg := err.Error()
+	logger.GetEchoLogger().Error(err)
 	if he, ok := err.(*echo.HTTPError); ok {
 		code = he.Code
-		msg = he.Message.(string)
-	}
-	if c.Echo().Debug {
 		msg = err.Error()
 	}
 

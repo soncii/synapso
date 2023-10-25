@@ -6,8 +6,8 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // indirect
 	_ "github.com/jinzhu/gorm/dialects/sqlite"   // indirect
-	"github.com/ybkuroki/go-webapp-project-template/config"
-	"github.com/ybkuroki/go-webapp-project-template/logger"
+	"synapso/config"
+	"synapso/logger"
 )
 
 // Repository defines a repository for access the database.

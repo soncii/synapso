@@ -2,11 +2,12 @@ package router
 
 import (
 	"net/http"
+	"synapso/config"
+	controller2 "synapso/transport/controller"
+	middles "synapso/transport/middleware"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/ybkuroki/go-webapp-project-template/config"
-	"github.com/ybkuroki/go-webapp-project-template/controller"
 )
 
 // Init initialize the routing of this application.
@@ -31,17 +32,14 @@ func Init(e *echo.Echo, conf *config.Config) {
 		}))
 	}
 
-	e.HTTPErrorHandler = controller.JSONErrorHandler
+	e.HTTPErrorHandler = controller2.JSONErrorHandler
 	e.Use(middleware.Recover())
 
-	e.GET(controller.APIAccountLoginStatus, controller.GetLoginStatus())
-	e.GET(controller.APIAccountLoginAccount, controller.GetLoginAccount())
-
-	if conf.Extension.SecurityEnabled {
-		e.POST(controller.APIAccountLogin, controller.PostLogin())
-		e.POST(controller.APIAccountLogout, controller.PostLogout())
-	}
-
-	e.GET(controller.APIHealth, controller.GetHealthCheck())
+	api := e.Group("/api")
+	api.GET("/health", controller2.GetHealthCheck())
+	api.GET("/login", controller2.GetLoginAccount(), middles.AuthAndExtractUserMiddleware)
+	api.POST("/sign-up", controller2.UserSignUp)
+	api.POST("/login", controller2.UserLogin)
+	//e.POST(controller2.APIAccountLogout, controller2.PostLogout())
 
 }
