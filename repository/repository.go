@@ -3,16 +3,17 @@ package repository
 import (
 	"fmt"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // indirect
-	_ "github.com/jinzhu/gorm/dialects/sqlite"   // indirect
+	_ "github.com/jinzhu/gorm/dialects/sqlite"   //
 	"synapso/config"
 	"synapso/logger"
 )
 
 // Repository defines a repository for access the database.
 type Repository struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 var rep *Repository
@@ -42,12 +43,13 @@ func InitDB() {
 	db, err := gorm.Open(conf.Database.Dialect, getConnection(conf))
 	if err != nil {
 		logger.GetEchoLogger().Error("Failure database connection")
+		logger.GetEchoLogger().Error(err)
 	}
 	logger.GetEchoLogger().Info(fmt.Sprintf("Success database connection, %s:%s", conf.Database.Host, conf.Database.Port))
 	db.LogMode(true)
 	db.SetLogger(logger.GetLogger())
 	rep = &Repository{}
-	rep.db = db
+	rep.Db = db
 }
 
 // GetRepository returns the object of repository.
@@ -57,62 +59,62 @@ func GetRepository() *Repository {
 
 // GetDB returns the object of gorm.DB.
 func GetDB() *gorm.DB {
-	return rep.db
+	return rep.Db
 }
 
 // Find find records that match given conditions.
 func (rep *Repository) Find(out interface{}, where ...interface{}) *gorm.DB {
-	return rep.db.Find(out, where...)
+	return rep.Db.Find(out, where...)
 }
 
 // Exec exec given SQL using by gorm.DB.
 func (rep *Repository) Exec(sql string, values ...interface{}) *gorm.DB {
-	return rep.db.Exec(sql, values...)
+	return rep.Db.Exec(sql, values...)
 }
 
 // First returns first record that match given conditions, order by primary key.
 func (rep *Repository) First(out interface{}, where ...interface{}) *gorm.DB {
-	return rep.db.First(out, where...)
+	return rep.Db.First(out, where...)
 }
 
 // Raw returns the record that executed the given SQL using gorm.DB.
 func (rep *Repository) Raw(sql string, values ...interface{}) *gorm.DB {
-	return rep.db.Raw(sql, values...)
+	return rep.Db.Raw(sql, values...)
 }
 
 // Create insert the value into database.
 func (rep *Repository) Create(value interface{}) *gorm.DB {
-	return rep.db.Create(value)
+	return rep.Db.Create(value)
 }
 
 // Save update value in database, if the value doesn't have primary key, will insert it.
 func (rep *Repository) Save(value interface{}) *gorm.DB {
-	return rep.db.Save(value)
+	return rep.Db.Save(value)
 }
 
 // Update update value in database
 func (rep *Repository) Update(value interface{}) *gorm.DB {
-	return rep.db.Update(value)
+	return rep.Db.Update(value)
 }
 
 // Delete delete value match given conditions.
 func (rep *Repository) Delete(value interface{}) *gorm.DB {
-	return rep.db.Delete(value)
+	return rep.Db.Delete(value)
 }
 
 // Where returns a new relation.
 func (rep *Repository) Where(query interface{}, args ...interface{}) *gorm.DB {
-	return rep.db.Where(query, args...)
+	return rep.Db.Where(query, args...)
 }
 
 // Preload preload associations with given conditions.
 func (rep *Repository) Preload(column string, conditions ...interface{}) *gorm.DB {
-	return rep.db.Preload(column, conditions...)
+	return rep.Db.Preload(column, conditions...)
 }
 
 // Scopes pass current database connection to arguments `func(*DB) *DB`, which could be used to add conditions dynamically
 func (rep *Repository) Scopes(funcs ...func(*gorm.DB) *gorm.DB) *gorm.DB {
-	return rep.db.Scopes(funcs...)
+	return rep.Db.Scopes(funcs...)
 }
 
 // Transaction start a transaction as a block.
@@ -121,7 +123,7 @@ func (rep *Repository) Scopes(funcs ...func(*gorm.DB) *gorm.DB) *gorm.DB {
 // ref: https://github.com/jinzhu/gorm/blob/master/main.go#L533
 func (rep *Repository) Transaction(fc func(tx *Repository) error) (err error) {
 	panicked := true
-	tx := rep.db.Begin()
+	tx := rep.Db.Begin()
 	defer func() {
 		if panicked || err != nil {
 			tx.Rollback()
@@ -129,7 +131,7 @@ func (rep *Repository) Transaction(fc func(tx *Repository) error) (err error) {
 	}()
 
 	txrep := &Repository{}
-	txrep.db = tx
+	txrep.Db = tx
 	err = fc(txrep)
 
 	if err == nil {

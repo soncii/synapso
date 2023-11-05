@@ -40,6 +40,23 @@ func Init(e *echo.Echo, conf *config.Config) {
 	api.GET("/login", controller2.GetLoginAccount(), middles.AuthAndExtractUserMiddleware)
 	api.POST("/sign-up", controller2.UserSignUp)
 	api.POST("/login", controller2.UserLogin)
-	//e.POST(controller2.APIAccountLogout, controller2.PostLogout())
+
+	researcher := api.Group("/researcher")
+	researcher.Use(middles.AuthAndExtractUserMiddleware, middles.AuthResearcherMiddleware)
+	researcher.POST("/recall", controller2.SaveRecall)
+	researcher.GET("/recall/:id", controller2.GetRecall)
+	researcher.POST("/recognition", controller2.SaveRecognitionExperiment)
+	researcher.GET("/recognition/:id", controller2.GetRecognitionExperiment)
+	researcher.GET("/experiment", controller2.ListExperiments)
+
+	subject := api.Group("/subject")
+	subject.Use(middles.AuthAndExtractUserMiddleware, middles.AuthSubjectMiddleware)
+	subject.POST("/result", controller2.SaveExperimentResult)
+	subject.GET("/result/:id", controller2.GetExperimentResult)
+	subject.GET("/result", controller2.GetExperimentResults)
+	subject.GET("/recognition/:id", controller2.GetRecognitionExperiment)
+	subject.GET("/recall/:id", controller2.GetRecall)
+	subject.GET("/experiment", controller2.ListExperiments)
+	//subject.POST("/recall", controller2.SaveRecallResult, middles.AuthAndExtractUserMiddleware, middles.AuthSubjectMiddleware)
 
 }

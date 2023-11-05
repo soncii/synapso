@@ -4,19 +4,19 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"synapso/enums"
 	"synapso/model"
 	"time"
 )
 
-var jwtSecret = []byte("your-secret-key")
+var jwtSecret = []byte("Damir Gimaletdinov")
 
 func GenerateToken(user *model.User) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = user.ID
-	claims["role"] = user.Role
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Token expires in 24 hours
-
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,
+		"role":    user.Role,
+		"exp":     time.Now().Add(time.Hour * 24 * 365).Unix(),
+	})
 	tokenString, err := token.SignedString(jwtSecret)
 	if err != nil {
 		return "", err
@@ -30,7 +30,10 @@ func AuthAndExtractUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if tokenString == "" {
 			return ctx.String(http.StatusUnauthorized, "Unauthorized")
 		}
-
+		if len(tokenString) < 7 {
+			return ctx.String(http.StatusUnauthorized, "Unauthorized")
+		}
+		tokenString = tokenString[7:]
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			return jwtSecret, nil
 		})
@@ -41,7 +44,7 @@ func AuthAndExtractUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		claims := token.Claims.(jwt.MapClaims)
 		user := model.User{
-			ID:   uint(claims["user_id"].(float64)),
+			ID:   int(claims["user_id"].(float64)),
 			Role: claims["role"].(string),
 		}
 
@@ -49,4 +52,34 @@ func AuthAndExtractUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		return next(ctx)
 	}
+}
+
+func AuthResearcherMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		if GetUserRoleFromContext(ctx) != enums.RESEARCHER {
+			return ctx.String(http.StatusUnauthorized, "Unauthorized: you are not a researcher")
+		}
+		return next(ctx)
+	}
+}
+
+func AuthSubjectMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		if GetUserRoleFromContext(ctx) != enums.SUBJECT {
+			return ctx.String(http.StatusUnauthorized, "Unauthorized: you are not a subject")
+		}
+		return next(ctx)
+	}
+}
+
+func getUserModelFromContext(ctx echo.Context) model.User {
+	return ctx.Get("user").(model.User)
+}
+
+func GetUserIDFromContext(ctx echo.Context) int {
+	return getUserModelFromContext(ctx).ID
+}
+
+func GetUserRoleFromContext(ctx echo.Context) string {
+	return getUserModelFromContext(ctx).Role
 }

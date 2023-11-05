@@ -11,7 +11,7 @@ import (
 
 // User defines struct of User data.
 type User struct {
-	ID           uint   `gorm:"primary_key" json:"id"`
+	ID           int    `gorm:"primary_key" json:"id"`
 	FirstName    string `json:"name"`
 	Surname      string `json:"surname"`
 	Email        string `json:"email" gorm:"unique"`
