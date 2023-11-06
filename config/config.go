@@ -56,6 +56,7 @@ var env *string
 func Load() {
 	env = flag.String("env", "develop", "To switch configurations.")
 	flag.Parse()
+
 	config = &Config{}
 	if err := configor.Load(config, "application."+*env+".yml"); err != nil {
 		fmt.Println(err)

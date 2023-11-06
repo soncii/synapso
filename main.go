@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
+	"os"
 	"synapso/config"
 	"synapso/logger"
 	"synapso/migration"
@@ -23,7 +24,9 @@ func main() {
 	migration.InitMasterData(config.GetConfig())
 
 	router.Init(e, config.GetConfig())
-	if err := e.Start(":8080"); err != nil {
+
+	port := os.Getenv("PORT")
+	if err := e.Start(port); err != nil {
 		e.Logger.Error(err)
 	}
 
