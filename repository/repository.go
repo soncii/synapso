@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -29,7 +30,7 @@ const (
 
 func getConnection(config *config.Config) string {
 	if config.Database.Dialect == POSTGRES {
-		return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Dbname, config.Database.Password)
+		return os.Getenv("DATABASE_URL")
 	} else if config.Database.Dialect == MYSQL {
 		return fmt.Sprintf("%s:%s(%s)/%s?charset=utf8&parseTime=True&loc=Local", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Dbname)
 	}
