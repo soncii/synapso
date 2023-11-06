@@ -31,7 +31,7 @@ func getConnection(config *config.Config) string {
 	if config.Database.Dialect == POSTGRES {
 		return fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", config.Database.Host, config.Database.Port, config.Database.Username, config.Database.Dbname, config.Database.Password)
 	} else if config.Database.Dialect == MYSQL {
-		return fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Dbname)
+		return fmt.Sprintf("%s:%s(%s)/%s?charset=utf8&parseTime=True&loc=Local", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Dbname)
 	}
 	return config.Database.Host
 }
@@ -40,6 +40,7 @@ func getConnection(config *config.Config) string {
 func InitDB() {
 	logger.GetEchoLogger().Info("Try database connection")
 	conf := config.GetConfig()
+	fmt.Println("My connection:" + getConnection(conf))
 	db, err := gorm.Open(conf.Database.Dialect, getConnection(conf))
 	if err != nil {
 		logger.GetEchoLogger().Error("Failure database connection")

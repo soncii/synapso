@@ -11,13 +11,13 @@ import (
 // Config represents the composition of yml settings.
 type Config struct {
 	Database struct {
-		Dialect   string `default:"sqlite3"`
-		Host      string `default:"test.db"`
-		Port      string
-		Dbname    string
-		Username  string
-		Password  string
-		Migration bool `default:"false"`
+		Dialect   string `default:"mysql"`
+		Host      string `default:"34.168.35.155"`
+		Port      string `default:"3306"`
+		Dbname    string `default:"synapso"`
+		Username  string `default:"root"`
+		Password  string `default:"admin"`
+		Migration bool   `default:"true"`
 	}
 	Redis struct {
 		Enabled            bool `default:"false"`

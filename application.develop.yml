@@ -1,10 +1,10 @@
 database:
-  dialect: mysql
-  host:  localhost
-  port: 3306
-  dbname: synapso
-  username: root
-  password: admin
+  dialect: postgres
+  host:  ec2-52-215-68-14.eu-west-1.compute.amazonaws.com
+  port: 5432
+  dbname: d2d2vtls3cu2p7
+  username: tfhrpkthrwnhry
+  password: d4f1a4d0125f96696995bc42633cde8cca2aaa4b37f99826cb88e9755fba2ff0
   migration: true
 
 extension:
