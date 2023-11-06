@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"os"
 	"synapso/config"
@@ -26,7 +27,8 @@ func main() {
 	router.Init(e, config.GetConfig())
 
 	port := os.Getenv("PORT")
-	if err := e.Start(port); err != nil {
+	fmt.Println("port:" + port)
+	if err := e.Start(":" + port); err != nil {
 		e.Logger.Error(err)
 	}
 
