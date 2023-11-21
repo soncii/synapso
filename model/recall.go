@@ -3,6 +3,7 @@ package model
 type RecallDTO struct {
 	ID               int      `json:"id"`
 	Name             string   `json:"name"`
+	UserId           int      `json:"userId"`
 	Stimulus         Stimulus `json:"stimulus"`
 	IsSequenceMatter bool     `json:"isSequenceMatter"`
 	IsFreeRecall     bool     `json:"isFreeRecall"`
@@ -22,6 +23,8 @@ func (r RecallDTO) ToModel(userID int) Recall {
 func (r Recall) ToDTO() RecallDTO {
 	var recallDTO RecallDTO
 	recallDTO.ID = r.ID
+	recallDTO.Name = r.Name
+	recallDTO.UserId = r.UserID
 	recallDTO.IsFreeRecall = r.IsFreeRecall
 	recallDTO.IsSequenceMatter = r.IsSequenceMatter
 	recallDTO.Stimulus.Type = r.Type
