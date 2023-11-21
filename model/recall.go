@@ -12,6 +12,7 @@ type RecallDTO struct {
 func (r RecallDTO) ToModel(userID int) Recall {
 	var recall Recall
 	recall.ID = r.ID
+	recall.Name = r.Name
 	recall.UserID = userID
 	recall.IsFreeRecall = r.IsFreeRecall
 	recall.IsSequenceMatter = r.IsSequenceMatter
