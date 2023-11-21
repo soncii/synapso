@@ -2,6 +2,7 @@ package model
 
 type RecallDTO struct {
 	ID               int      `json:"id"`
+	Name             string   `json:"name"`
 	Stimulus         Stimulus `json:"stimulus"`
 	IsSequenceMatter bool     `json:"isSequenceMatter"`
 	IsFreeRecall     bool     `json:"isFreeRecall"`
@@ -30,6 +31,7 @@ func (r Recall) ToDTO() RecallDTO {
 
 type Recall struct {
 	ID               int       `json:"id"`
+	Name             string    `json:"name"`
 	UserID           int       `json:"userId"`
 	Type             string    `json:"type"`
 	Stimuli          []Stimuli `json:"stimulus" gorm:"-"`

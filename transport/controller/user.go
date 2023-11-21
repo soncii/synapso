@@ -62,6 +62,6 @@ func UserLogin(ctx echo.Context) error {
 		return err
 	}
 	ctx.Response().Header().Set("Authorization", "Bearer "+token)
-	return ctx.JSON(http.StatusOK, u)
+	return ctx.JSON(http.StatusOK, "Bearer "+token)
 
 }

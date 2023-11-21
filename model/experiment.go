@@ -9,6 +9,7 @@ type ExperimentList struct {
 
 type ExperimentResult struct {
 	Id             int    `json:"id"`
+	Name           string `json:"name"`
 	Type           string `json:"experimentType"`
 	RecognitionId  int    `json:"experimentId"`
 	UserId         int    `json:"userId"`
@@ -18,8 +19,9 @@ type ExperimentResult struct {
 
 type ExperimentResultDTO struct {
 	Id             int      `json:"id"`
+	Name           string   `json:"name"`
 	Type           string   `json:"type"`
-	RecognitionId  int      `json:"recognitionId"`
+	RecognitionId  int      `json:"experimentId"`
 	UserId         int      `json:"userId"`
 	Response       []string `json:"response"`
 	TimeToComplete int      `json:"timeToComplete"`
@@ -27,6 +29,7 @@ type ExperimentResultDTO struct {
 
 func (d ExperimentResultDTO) ToModel() (result ExperimentResult) {
 	result.Id = d.Id
+	result.Name = d.Name
 	result.Type = d.Type
 	result.RecognitionId = d.RecognitionId
 	result.UserId = d.UserId
@@ -37,6 +40,7 @@ func (d ExperimentResultDTO) ToModel() (result ExperimentResult) {
 
 func (d ExperimentResult) ToDTO() (result ExperimentResultDTO) {
 	result.Id = d.Id
+	result.Name = d.Name
 	result.Type = d.Type
 	result.RecognitionId = d.RecognitionId
 	result.UserId = d.UserId
