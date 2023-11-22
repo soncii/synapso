@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"synapso/enums"
 	"synapso/logger"
 	"synapso/model"
 	"synapso/service"
@@ -61,7 +62,11 @@ func UserLogin(ctx echo.Context) error {
 		ctx.NoContent(http.StatusInternalServerError)
 		return err
 	}
+
 	ctx.Response().Header().Set("Authorization", "Bearer "+token)
-	return ctx.JSON(http.StatusOK, "Bearer "+token)
+	if u.Role == enums.RESEARCHER {
+		return ctx.JSON(http.StatusOK, "Bearer "+token)
+	}
+	return ctx.JSON(http.StatusOK, u)
 
 }

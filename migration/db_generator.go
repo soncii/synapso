@@ -11,10 +11,6 @@ func CreateDatabase(config *config.Config) {
 	if config.Database.Migration {
 		db := repository.GetDB()
 		//db.DropTable(&model.User{})
-		db.DropTable(&model.Recognition{})
-		db.DropTable(&model.RecognitionData{})
-		db.DropTable(&model.Recall{})
-		db.DropTable(&model.RecallResult{})
 		db.AutoMigrate(&model.User{})
 		db.AutoMigrate(&model.RecallResult{})
 		db.AutoMigrate(&model.Recall{})
