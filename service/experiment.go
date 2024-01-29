@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"encoding/csv"
 	"fmt"
 	"github.com/jinzhu/gorm"
@@ -54,16 +55,13 @@ func GetExperimentResult(ctx echo.Context, id int) (model.ExperimentResultDTO, e
 	return recognitionResult.ToDTO(), err
 }
 
-func GetExperimentResultByExperimentIdAndType(ctx echo.Context, experimentId int, experimentType string) (body bytes.Buffer, err error) {
+func GetRecognitionResultByExperimentId(ctx echo.Context, experimentId int) (body bytes.Buffer, filename string, err error) {
 	var results []model.ExperimentResult
 	repo := repository.GetRepository()
-	err = repo.Where("recognition_id = ? AND type = ?", experimentId, experimentType).Find(&results).Error
-	var recognition model.RecognitionDTO
-	if experimentType == "recognition" {
-		recognition, err = GetRecognition(ctx, experimentId)
-		if err != nil {
-			return body, err
-		}
+	err = repo.Where("recognition_id = ? AND type = ?", experimentId, "recognition").Find(&results).Error
+	recognition, err := GetRecognition(ctx, experimentId)
+	if err != nil {
+		return
 	}
 	logger.GetEchoLogger().Info("results: ", results, "recognition: ", recognition)
 	var w bytes.Buffer
@@ -110,7 +108,66 @@ func GetExperimentResultByExperimentIdAndType(ctx echo.Context, experimentId int
 	}
 	writer.Flush()
 	logger.GetEchoLogger().Info("w: ", w.String())
-	return w, nil
+	return w, recognition.Name, nil
+}
+
+func GetRecallResultByExperimentId(ctx echo.Context, experimentId int) (body bytes.Buffer, filename string, err error) {
+	var results []model.ExperimentResult
+	repo := repository.GetRepository()
+	err = repo.Where("recognition_id = ? AND type = ?", experimentId, "recall").Find(&results).Error
+	recall, err := GetRecallExperiment(context.TODO(), experimentId)
+	if err != nil {
+		return
+	}
+	logger.GetEchoLogger().Info("results: ", results, "recall: ", recall)
+	var w bytes.Buffer
+	writer := csv.NewWriter(&w)
+
+	// Write the CSV header
+	header := []string{"Id", "Subject Name", "TimeToComplete", "%correct"}
+	for _, data := range recall.Stimulus.Stimuli {
+		header = append(header, data.Data)
+	}
+	err = writer.Write(header)
+	if err != nil {
+		logger.GetEchoLogger().Error(err)
+	}
+
+	for _, result := range results {
+		// Convert Response to a comma-separated string
+		record := []string{
+			strconv.Itoa(result.Id),
+			result.Name,
+			strconv.Itoa(result.TimeToComplete),
+		}
+		var correct int
+		var words []string
+		for _, data := range strings.Split(result.Response, ",") {
+			words = append(words, data)
+			for _, cor := range recall.Stimulus.Stimuli {
+				if data == cor.Data {
+					correct += 1
+					break
+				}
+			}
+		}
+		if len(result.Response) == 0 {
+			record = append(record, "0.00")
+		} else {
+			percentageCompleted := float64(correct*100) / float64(len(strings.Split(result.Response, ",")))
+			formattedPercentage := fmt.Sprintf("%.2f", percentageCompleted)
+			record = append(record, formattedPercentage)
+		}
+		record = append(record, words...)
+
+		err := writer.Write(record)
+		if err != nil {
+			logger.GetEchoLogger().Error(err)
+		}
+	}
+	writer.Flush()
+	logger.GetEchoLogger().Info("w: ", w.String())
+	return w, recall.Name, nil
 }
 
 func GetExperimentResultsByUserID(ctx echo.Context, userID int) ([]model.ExperimentResultDTO, error) {

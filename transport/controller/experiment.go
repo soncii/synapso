@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bytes"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -48,29 +49,33 @@ func GetExperimentResult(ctx echo.Context) (err error) {
 func GetExperimentResultCsv(ctx echo.Context) (err error) {
 	id := ctx.Param("id")
 	experimentType := ctx.QueryParam("experimentType")
-	var name string
-
 	intId, err := strconv.Atoi(id)
-	if experimentType == "recognition" {
-		recognition, err := service.GetRecognition(ctx, intId)
-		if err != nil {
-			return err
-		}
-		name = recognition.Name
-	}
 	if err != nil {
 		return ctx.JSON(400, err)
 	}
 	logger.GetEchoLogger().Info("experimentType: "+experimentType, "id: "+id)
-	recognitionResult, err := service.GetExperimentResultByExperimentIdAndType(ctx, intId, experimentType)
+	var body bytes.Buffer
+	var filename string
+	if experimentType == "recognition" {
+		body, filename, err = service.GetRecognitionResultByExperimentId(ctx, intId)
+		if err != nil {
+			return ctx.JSON(500, err)
+		}
+	} else {
+		body, filename, err = service.GetRecallResultByExperimentId(ctx, intId)
+		if err != nil {
+			return ctx.JSON(500, err)
+		}
+	}
+
 	if err != nil {
 		return ctx.JSON(500, err)
 	}
-	ctx.Response().Header().Set("Content-Type", "application/octet-stream")
+	ctx.Response().Header().Set("Content-Type", "text/csv")
 	ctx.Response().Header().Set("Content-Description", "File Transfer")
-	ctx.Response().Header().Set("Content-Disposition", "attachment; filename="+name+"_results.csv")
+	ctx.Response().Header().Set("Content-Disposition", "attachment; filename="+filename+"_results.csv")
 	ctx.Response().Header().Set("Content-Description", "File Transfer")
-	return ctx.Blob(http.StatusOK, "application/octet-stream", recognitionResult.Bytes())
+	return ctx.Blob(http.StatusOK, "text/csv", body.Bytes())
 
 }
 
