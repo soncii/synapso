@@ -10,6 +10,9 @@ import (
 func SaveRecognitionExperiment(ctx echo.Context) (err error) {
 	var recognition model.RecognitionDTO
 	err = ctx.Bind(&recognition)
+	if recognition.Name == "" || recognition.Data == nil {
+		return ctx.JSON(400, "name and data are required")
+	}
 	if err != nil {
 		return ctx.NoContent(400)
 	}

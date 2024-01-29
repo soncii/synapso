@@ -18,6 +18,9 @@ func SaveRecall(ctx echo.Context) (err error) {
 	}()
 	var recall model.RecallDTO
 	err = ctx.Bind(&recall)
+	if recall.Name == "" {
+		return ctx.JSON(400, "name and data are required")
+	}
 	if err != nil {
 		return err
 	}
