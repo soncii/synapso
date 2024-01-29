@@ -45,7 +45,7 @@ func GetExperimentResult(ctx echo.Context) (err error) {
 
 func GetExperimentResultCsv(ctx echo.Context) (err error) {
 	id := ctx.Param("id")
-	experimentType := ctx.Param("experimentType")
+	experimentType := ctx.QueryParam("experimentType")
 	intId, err := strconv.Atoi(id)
 	if err != nil {
 		return ctx.JSON(400, err)

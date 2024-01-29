@@ -48,6 +48,7 @@ func Init(e *echo.Echo, conf *config.Config) {
 	researcher.POST("/recognition", controller2.SaveRecognitionExperiment)
 	researcher.GET("/recognition/:id", controller2.GetRecognitionExperiment)
 	researcher.GET("/experiment", controller2.ListExperiments)
+	researcher.GET("/result/:id", controller2.GetExperimentResultCsv)
 
 	subject := api.Group("/subject")
 	subject.Use(middles.AuthAndExtractUserMiddleware, middles.AuthSubjectMiddleware)
