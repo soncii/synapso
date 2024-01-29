@@ -1,8 +1,12 @@
 package service
 
 import (
+	"bytes"
+	"encoding/csv"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"strconv"
 	"synapso/model"
 	"synapso/repository"
 	middles "synapso/transport/middleware"
@@ -33,6 +37,9 @@ func ListExperiments(ctx echo.Context) (result model.ExperimentList, err error) 
 func SaveExperimentResult(ctx echo.Context, recognitionResult model.ExperimentResultDTO) error {
 	repo := repository.GetRepository()
 	recognitionResult.UserId = middles.GetUserIDFromContext(ctx)
+	var user model.User
+	repo.Where("id=?", recognitionResult.UserId).First(&user)
+	recognitionResult.Name = user.FirstName + " " + user.Surname
 	m := recognitionResult.ToModel()
 	return repo.Save(&m).Error
 }
@@ -43,6 +50,56 @@ func GetExperimentResult(ctx echo.Context, id int) (model.ExperimentResultDTO, e
 	err := repo.First(&recognitionResult, id).Error
 
 	return recognitionResult.ToDTO(), err
+}
+
+func GetExperimentResultByExperimentIdAndType(ctx echo.Context, experimentId int, experimentType string) (body bytes.Buffer, err error) {
+	var results []model.ExperimentResultDTO
+	repo := repository.GetRepository()
+	err = repo.Where("recognition_id = ? AND experiment_type = ?", experimentId, experimentType).Find(&results).Error
+	var recognition model.RecognitionDTO
+	if experimentType == "recall" {
+		recognition, err = GetRecognition(ctx, experimentId)
+		if err != nil {
+			return body, err
+		}
+	}
+	var w bytes.Buffer
+	writer := csv.NewWriter(&w)
+	defer writer.Flush()
+
+	// Write the CSV header
+	header := []string{"Id", "Subject Name", "TimeToComplete"}
+	for _, data := range recognition.Data {
+		header = append(header, data.Displayed+"/"+data.Hidden)
+	}
+	header = append(header, "%correct")
+	writer.Write(header)
+
+	for _, result := range results {
+		// Convert Response to a comma-separated string
+		record := []string{
+			strconv.Itoa(result.Id),
+			result.Name,
+			strconv.Itoa(result.TimeToComplete),
+		}
+		var correct int
+		for i, data := range result.Response {
+			record = append(record, data)
+			if data == recognition.Data[i].Displayed {
+				correct += 1
+			}
+		}
+		if len(result.Response) == 0 {
+			record = append(record, "0.00")
+		} else {
+			percentageCompleted := float64(correct*100) / float64(len(result.Response))
+			formattedPercentage := fmt.Sprintf("%.2f", percentageCompleted)
+			record = append(record, formattedPercentage)
+		}
+
+		writer.Write(record)
+	}
+	return w, nil
 }
 
 func GetExperimentResultsByUserID(ctx echo.Context, userID int) ([]model.ExperimentResultDTO, error) {

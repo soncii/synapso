@@ -39,7 +39,26 @@ func GetExperimentResult(ctx echo.Context) (err error) {
 	if err != nil {
 		return ctx.JSON(500, err)
 	}
+
 	return ctx.JSON(200, recognitionResult)
+}
+
+func GetExperimentResultCsv(ctx echo.Context) (err error) {
+	id := ctx.Param("id")
+	experimentType := ctx.Param("experimentType")
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return ctx.JSON(400, err)
+	}
+	recognitionResult, err := service.GetExperimentResultByExperimentIdAndType(ctx, intId, experimentType)
+	if err != nil {
+		return ctx.JSON(500, err)
+	}
+	ctx.Response().Header().Set("Content-Type", "text/csv")
+	ctx.Response().Header().Set("Content-Description", "File Transfer")
+	ctx.Response().Header().Set("Content-Disposition", "attachment; filename=experimentResult_"+id+".csv")
+	ctx.Response().Write(recognitionResult.Bytes())
+	return nil
 }
 
 func GetExperimentResults(ctx echo.Context) (err error) {
