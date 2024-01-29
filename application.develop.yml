@@ -1,10 +1,10 @@
 database:
   dialect: postgres
-  host:  ec2-52-215-68-14.eu-west-1.compute.amazonaws.com
+  host:  ec2-52-48-190-253.eu-west-1.compute.amazonaws.com
   port: 5432
-  dbname: d2d2vtls3cu2p7
-  username: tfhrpkthrwnhry
-  password: d4f1a4d0125f96696995bc42633cde8cca2aaa4b37f99826cb88e9755fba2ff0
+  dbname: d75lv9bvljste0
+  username: vbhnbuideyibyy
+  password: a86c700294a4eabad0c594e086e6ce7051f1edeaac6da0830c71a7e9218b85a5
   migration: true
 
 extension:

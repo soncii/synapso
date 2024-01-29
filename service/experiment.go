@@ -7,6 +7,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"strconv"
+	"strings"
+	"synapso/logger"
 	"synapso/model"
 	"synapso/repository"
 	middles "synapso/transport/middleware"
@@ -53,27 +55,29 @@ func GetExperimentResult(ctx echo.Context, id int) (model.ExperimentResultDTO, e
 }
 
 func GetExperimentResultByExperimentIdAndType(ctx echo.Context, experimentId int, experimentType string) (body bytes.Buffer, err error) {
-	var results []model.ExperimentResultDTO
+	var results []model.ExperimentResult
 	repo := repository.GetRepository()
-	err = repo.Where("recognition_id = ? AND experiment_type = ?", experimentId, experimentType).Find(&results).Error
+	err = repo.Where("recognition_id = ? AND type = ?", experimentId, experimentType).Find(&results).Error
 	var recognition model.RecognitionDTO
-	if experimentType == "recall" {
+	if experimentType == "recognition" {
 		recognition, err = GetRecognition(ctx, experimentId)
 		if err != nil {
 			return body, err
 		}
 	}
+	logger.GetEchoLogger().Info("results: ", results, "recognition: ", recognition)
 	var w bytes.Buffer
 	writer := csv.NewWriter(&w)
-	defer writer.Flush()
 
 	// Write the CSV header
-	header := []string{"Id", "Subject Name", "TimeToComplete"}
+	header := []string{"Id", "Subject Name", "TimeToComplete", "%correct"}
 	for _, data := range recognition.Data {
 		header = append(header, data.Displayed+"/"+data.Hidden)
 	}
-	header = append(header, "%correct")
-	writer.Write(header)
+	err = writer.Write(header)
+	if err != nil {
+		logger.GetEchoLogger().Error(err)
+	}
 
 	for _, result := range results {
 		// Convert Response to a comma-separated string
@@ -83,8 +87,9 @@ func GetExperimentResultByExperimentIdAndType(ctx echo.Context, experimentId int
 			strconv.Itoa(result.TimeToComplete),
 		}
 		var correct int
-		for i, data := range result.Response {
-			record = append(record, data)
+		var words []string
+		for i, data := range strings.Split(result.Response, ",") {
+			words = append(words, data)
 			if data == recognition.Data[i].Displayed {
 				correct += 1
 			}
@@ -92,13 +97,19 @@ func GetExperimentResultByExperimentIdAndType(ctx echo.Context, experimentId int
 		if len(result.Response) == 0 {
 			record = append(record, "0.00")
 		} else {
-			percentageCompleted := float64(correct*100) / float64(len(result.Response))
+			percentageCompleted := float64(correct*100) / float64(len(strings.Split(result.Response, ",")))
 			formattedPercentage := fmt.Sprintf("%.2f", percentageCompleted)
 			record = append(record, formattedPercentage)
 		}
+		record = append(record, words...)
 
-		writer.Write(record)
+		err := writer.Write(record)
+		if err != nil {
+			logger.GetEchoLogger().Error(err)
+		}
 	}
+	writer.Flush()
+	logger.GetEchoLogger().Info("w: ", w.String())
 	return w, nil
 }
 

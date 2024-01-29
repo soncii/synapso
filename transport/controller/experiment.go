@@ -2,7 +2,9 @@ package controller
 
 import (
 	"github.com/labstack/echo/v4"
+	"net/http"
 	"strconv"
+	"synapso/logger"
 	"synapso/model"
 	"synapso/service"
 	middles "synapso/transport/middleware"
@@ -46,19 +48,30 @@ func GetExperimentResult(ctx echo.Context) (err error) {
 func GetExperimentResultCsv(ctx echo.Context) (err error) {
 	id := ctx.Param("id")
 	experimentType := ctx.QueryParam("experimentType")
+	var name string
+
 	intId, err := strconv.Atoi(id)
+	if experimentType == "recognition" {
+		recognition, err := service.GetRecognition(ctx, intId)
+		if err != nil {
+			return err
+		}
+		name = recognition.Name
+	}
 	if err != nil {
 		return ctx.JSON(400, err)
 	}
+	logger.GetEchoLogger().Info("experimentType: "+experimentType, "id: "+id)
 	recognitionResult, err := service.GetExperimentResultByExperimentIdAndType(ctx, intId, experimentType)
 	if err != nil {
 		return ctx.JSON(500, err)
 	}
-	ctx.Response().Header().Set("Content-Type", "text/csv")
+	ctx.Response().Header().Set("Content-Type", "application/octet-stream")
 	ctx.Response().Header().Set("Content-Description", "File Transfer")
-	ctx.Response().Header().Set("Content-Disposition", "attachment; filename=experimentResult_"+id+".csv")
-	ctx.Response().Write(recognitionResult.Bytes())
-	return nil
+	ctx.Response().Header().Set("Content-Disposition", "attachment; filename="+name+"_results.csv")
+	ctx.Response().Header().Set("Content-Description", "File Transfer")
+	return ctx.Blob(http.StatusOK, "application/octet-stream", recognitionResult.Bytes())
+
 }
 
 func GetExperimentResults(ctx echo.Context) (err error) {
