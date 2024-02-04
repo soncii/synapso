@@ -183,3 +183,13 @@ func GetExperimentResultsByUserID(ctx echo.Context, userID int) ([]model.Experim
 	}
 	return recognitionResultsDTO, nil
 }
+
+func DeleteAllExperiment(ctx echo.Context) error {
+	repo := repository.GetRepository()
+	repo.Delete(model.Recognition{})
+	repo.Delete(model.RecognitionData{})
+	repo.Delete(model.Recall{})
+	repo.Delete(model.Stimulus{})
+	repo.Delete(model.ExperimentResult{})
+	return nil
+}

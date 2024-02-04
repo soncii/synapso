@@ -87,3 +87,12 @@ func GetExperimentResults(ctx echo.Context) (err error) {
 	}
 	return ctx.JSON(200, recognitionResult)
 }
+
+func DeleteAllExperiment(ctx echo.Context) (err error) {
+	err = service.DeleteAllExperiment(ctx)
+	if err != nil {
+		ctx.JSON(500, err)
+	}
+	ctx.NoContent(200)
+	return
+}
