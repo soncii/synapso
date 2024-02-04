@@ -1,12 +1,16 @@
 package model
 
 type RecallDTO struct {
-	ID               int      `json:"id"`
-	Name             string   `json:"name"`
-	UserId           int      `json:"userId"`
-	Stimulus         Stimulus `json:"stimulus"`
-	IsSequenceMatter bool     `json:"isSequenceMatter"`
-	IsFreeRecall     bool     `json:"isFreeRecall"`
+	ID                   int      `json:"id"`
+	Name                 string   `json:"name"`
+	UserId               int      `json:"userId"`
+	IsDistractionEnabled bool     `json:"isDistractionEnabled"`
+	DistractionType      string   `json:"distractionType"`
+	DistractionText      string   `json:"distractionText"`
+	DistractionDuration  int      `json:"distractionDuration"`
+	InterStimuliDelay    int      `json:"interStimuliDelay"`
+	IsFreeRecall         bool     `json:"isFreeRecall"`
+	Stimulus             Stimulus `json:"stimulus"`
 }
 
 func (r RecallDTO) ToModel(userID int) Recall {
@@ -15,8 +19,12 @@ func (r RecallDTO) ToModel(userID int) Recall {
 	recall.Name = r.Name
 	recall.UserID = userID
 	recall.IsFreeRecall = r.IsFreeRecall
-	recall.IsSequenceMatter = r.IsSequenceMatter
 	recall.Type = r.Stimulus.Type
+	recall.DistractionDuration = r.DistractionDuration
+	recall.DistractionText = r.DistractionText
+	recall.DistractionType = r.DistractionType
+	recall.InterStimuliDelay = r.InterStimuliDelay
+	recall.IsDistractionEnabled = r.IsDistractionEnabled
 	recall.Stimuli = r.Stimulus.Stimuli
 	return recall
 }
@@ -27,20 +35,28 @@ func (r Recall) ToDTO() RecallDTO {
 	recallDTO.Name = r.Name
 	recallDTO.UserId = r.UserID
 	recallDTO.IsFreeRecall = r.IsFreeRecall
-	recallDTO.IsSequenceMatter = r.IsSequenceMatter
+	recallDTO.IsDistractionEnabled = r.IsDistractionEnabled
+	recallDTO.DistractionType = r.DistractionType
+	recallDTO.DistractionText = r.DistractionText
+	recallDTO.DistractionDuration = r.DistractionDuration
+	recallDTO.InterStimuliDelay = r.InterStimuliDelay
 	recallDTO.Stimulus.Type = r.Type
 	recallDTO.Stimulus.Stimuli = r.Stimuli
 	return recallDTO
 }
 
 type Recall struct {
-	ID               int       `json:"id"`
-	Name             string    `json:"name"`
-	UserID           int       `json:"userId"`
-	Type             string    `json:"type"`
-	Stimuli          []Stimuli `json:"stimulus" gorm:"-"`
-	IsSequenceMatter bool      `json:"isSequenceMatter"`
-	IsFreeRecall     bool      `json:"isFreeRecall"`
+	ID                   int       `json:"id"`
+	Name                 string    `json:"name"`
+	UserID               int       `json:"userId"`
+	Type                 string    `json:"type"`
+	Stimuli              []Stimuli `json:"stimulus" gorm:"-"`
+	IsDistractionEnabled bool      `json:"isDistractionEnabled"`
+	DistractionType      string    `json:"distractionType"`
+	DistractionText      string    `json:"distractionText"`
+	DistractionDuration  int       `json:"distractionDuration"`
+	InterStimuliDelay    int       `json:"interStimuliDelay"`
+	IsFreeRecall         bool      `json:"isFreeRecall"`
 }
 
 type Stimulus struct {
