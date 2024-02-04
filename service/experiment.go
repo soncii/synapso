@@ -171,13 +171,14 @@ func GetRecallResultByExperimentId(ctx echo.Context, experimentId int) (body byt
 }
 
 func GetExperimentResultsByUserID(ctx echo.Context, userID int) ([]model.ExperimentResultDTO, error) {
+
 	repo := repository.GetRepository()
-	var recognitionResults []model.ExperimentResult
+	var recognitionResults = make([]model.ExperimentResult, 0)
 	err := repo.Where("user_id = ?", userID).Find(&recognitionResults).Error
 	if err != nil {
 		return nil, err
 	}
-	var recognitionResultsDTO []model.ExperimentResultDTO
+	var recognitionResultsDTO = make([]model.ExperimentResultDTO, 0)
 	for _, recognitionResult := range recognitionResults {
 		recognitionResultsDTO = append(recognitionResultsDTO, recognitionResult.ToDTO())
 	}
