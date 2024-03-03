@@ -5,6 +5,7 @@ type RecognitionDTO struct {
 	Name                 string            `json:"name"`
 	UserId               int               `json:"userId"`
 	Type                 string            `json:"type"`
+	InstructionText      string            `json:"instructionText"`
 	IsDistractionEnabled bool              `json:"isDistractionEnabled"`
 	DistractionType      string            `json:"distractionType"`
 	DistractionText      string            `json:"distractionText"`
@@ -18,6 +19,7 @@ func (r RecognitionDTO) ToModel(userID int) Recognition {
 	recognition.Id = r.Id
 	recognition.Name = r.Name
 	recognition.UserId = userID
+	recognition.InstructionText = r.InstructionText
 	recognition.Type = r.Type
 	recognition.InterStimuliDelay = r.InterStimuliDelay
 	recognition.IsDistractionEnabled = r.IsDistractionEnabled
@@ -31,6 +33,7 @@ type Recognition struct {
 	Id                   int    `json:"id"`
 	UserId               int    `json:"userId"`
 	Name                 string `json:"name"`
+	InstructionText      string `json:"instructionText"`
 	Type                 string `json:"type"`
 	InterStimuliDelay    int    `json:"interStimuliDelay"`
 	IsDistractionEnabled bool   `json:"isDistractionEnabled"`
@@ -43,6 +46,7 @@ func (r Recognition) ToDTO(Data []RecognitionData) RecognitionDTO {
 	var recognitionDTO RecognitionDTO
 	recognitionDTO.Id = r.Id
 	recognitionDTO.Name = r.Name
+	recognitionDTO.InstructionText = r.InstructionText
 	recognitionDTO.DistractionDuration = r.DistractionDuration
 	recognitionDTO.UserId = r.UserId
 	recognitionDTO.Type = r.Type

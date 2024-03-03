@@ -4,6 +4,7 @@ type RecallDTO struct {
 	ID                   int      `json:"id"`
 	Name                 string   `json:"name"`
 	UserId               int      `json:"userId"`
+	InstructionText      string   `json:"instructionText"`
 	IsDistractionEnabled bool     `json:"isDistractionEnabled"`
 	DistractionType      string   `json:"distractionType"`
 	DistractionText      string   `json:"distractionText"`
@@ -18,6 +19,7 @@ func (r RecallDTO) ToModel(userID int) Recall {
 	recall.ID = r.ID
 	recall.Name = r.Name
 	recall.UserID = userID
+	recall.InstructionText = r.InstructionText
 	recall.IsFreeRecall = r.IsFreeRecall
 	recall.Type = r.Stimulus.Type
 	recall.DistractionDuration = r.DistractionDuration
@@ -33,6 +35,7 @@ func (r Recall) ToDTO() RecallDTO {
 	var recallDTO RecallDTO
 	recallDTO.ID = r.ID
 	recallDTO.Name = r.Name
+	recallDTO.InstructionText = r.InstructionText
 	recallDTO.UserId = r.UserID
 	recallDTO.IsFreeRecall = r.IsFreeRecall
 	recallDTO.IsDistractionEnabled = r.IsDistractionEnabled
@@ -50,6 +53,7 @@ type Recall struct {
 	Name                 string    `json:"name"`
 	UserID               int       `json:"userId"`
 	Type                 string    `json:"type"`
+	InstructionText      string    `json:"instructionText"`
 	Stimuli              []Stimuli `json:"stimulus" gorm:"-"`
 	IsDistractionEnabled bool      `json:"isDistractionEnabled"`
 	DistractionType      string    `json:"distractionType"`
