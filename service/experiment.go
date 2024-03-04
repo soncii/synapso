@@ -40,8 +40,9 @@ func ListExperiments(ctx echo.Context) (result model.ExperimentList, err error) 
 
 func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon, err error) {
 	repo := repository.GetRepository()
+	userId := middles.GetUserIDFromContext(ctx)
 	var recalls []model.Recall
-	err = repo.Find(&recalls).Error
+	err = repo.Db.Where("user_id", userId).Find(&recalls).Error
 	if err != nil && !gorm.IsRecordNotFoundError(err) {
 		return
 	}
@@ -58,7 +59,7 @@ func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon
 	}
 
 	var recognition []model.Recognition
-	err = repo.Find(&recognition).Error
+	err = repo.Db.Where("user_id", userId).Find(&recognition).Error
 	for i := 0; i < len(recognition); i++ {
 		var exp model.ExperimentCommon
 		exp.Id = recognition[i].Id
