@@ -1,9 +1,20 @@
 package model
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
+
+const layout = "02.01.2006 15:04"
+
+type CustomTime struct {
+	time.Time
+}
+
+func (ct *CustomTime) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("\"%s\"", ct.Time.Format(layout))), nil
+}
 
 type ExperimentList struct {
 	Recall      []RecallDTO      `json:"recall"`
@@ -11,13 +22,13 @@ type ExperimentList struct {
 }
 
 type ExperimentCommon struct {
-	Id              int       `json:"id"`
-	Name            string    `json:"name"`
-	Type            string    `json:"type"`
-	DistractionType string    `json:"distractionType"`
-	CreatedAt       time.Time `json:"createdAt"`
-	StimulusType    string    `json:"stimulusType"`
-	UsersResponded  int       `json:"usersResponded"`
+	Id              int        `json:"id"`
+	Name            string     `json:"name"`
+	Type            string     `json:"type"`
+	DistractionType string     `json:"distractionType"`
+	CreatedAt       CustomTime `json:"createdAt"`
+	StimulusType    string     `json:"stimulusType"`
+	UsersResponded  int        `json:"usersResponded"`
 }
 
 type ExperimentResult struct {
