@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type RecallDTO struct {
 	ID                   int      `json:"id"`
 	Name                 string   `json:"name"`
@@ -19,6 +21,7 @@ func (r RecallDTO) ToModel(userID int) Recall {
 	recall.ID = r.ID
 	recall.Name = r.Name
 	recall.UserID = userID
+	recall.CreatedAt = time.Now()
 	recall.InstructionText = r.InstructionText
 	recall.IsFreeRecall = r.IsFreeRecall
 	recall.Type = r.Stimulus.Type
@@ -52,6 +55,7 @@ type Recall struct {
 	ID                   int       `json:"id"`
 	Name                 string    `json:"name"`
 	UserID               int       `json:"userId"`
+	CreatedAt            time.Time `json:"createdAt"`
 	Type                 string    `json:"type"`
 	InstructionText      string    `json:"instructionText"`
 	Stimuli              []Stimuli `json:"stimulus" gorm:"-"`

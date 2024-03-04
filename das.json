@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name":"exp 1",
+  "type": "recall",
+  "distractionType": "none",
+  "createdAt": "2017-01-01T00:00:00.000Z",
+  "stimulusType": "words",
+  "usersResponded": 10
+}

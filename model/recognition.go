@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type RecognitionDTO struct {
 	Id                   int               `json:"id"`
 	Name                 string            `json:"name"`
@@ -18,6 +20,7 @@ func (r RecognitionDTO) ToModel(userID int) Recognition {
 	var recognition Recognition
 	recognition.Id = r.Id
 	recognition.Name = r.Name
+	recognition.CreatedAt = time.Now()
 	recognition.UserId = userID
 	recognition.InstructionText = r.InstructionText
 	recognition.Type = r.Type
@@ -30,16 +33,17 @@ func (r RecognitionDTO) ToModel(userID int) Recognition {
 }
 
 type Recognition struct {
-	Id                   int    `json:"id"`
-	UserId               int    `json:"userId"`
-	Name                 string `json:"name"`
-	InstructionText      string `json:"instructionText"`
-	Type                 string `json:"type"`
-	InterStimuliDelay    int    `json:"interStimuliDelay"`
-	IsDistractionEnabled bool   `json:"isDistractionEnabled"`
-	DistractionDuration  int    `json:"distractionDuration"`
-	DistractionType      string `json:"distractionType"`
-	DistractionText      string `json:"distractionText"`
+	Id                   int       `json:"id"`
+	UserId               int       `json:"userId"`
+	CreatedAt            time.Time `json:"createdAt"`
+	Name                 string    `json:"name"`
+	InstructionText      string    `json:"instructionText"`
+	Type                 string    `json:"type"`
+	InterStimuliDelay    int       `json:"interStimuliDelay"`
+	IsDistractionEnabled bool      `json:"isDistractionEnabled"`
+	DistractionDuration  int       `json:"distractionDuration"`
+	DistractionType      string    `json:"distractionType"`
+	DistractionText      string    `json:"distractionText"`
 }
 
 func (r Recognition) ToDTO(Data []RecognitionData) RecognitionDTO {

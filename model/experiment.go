@@ -1,10 +1,23 @@
 package model
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
 
 type ExperimentList struct {
 	Recall      []RecallDTO      `json:"recall"`
 	Recognition []RecognitionDTO `json:"recognition"`
+}
+
+type ExperimentCommon struct {
+	Id              int       `json:"id"`
+	Name            string    `json:"name"`
+	Type            string    `json:"type"`
+	DistractionType string    `json:"distractionType"`
+	CreatedAt       time.Time `json:"createdAt"`
+	StimulusType    string    `json:"stimulusType"`
+	UsersResponded  int       `json:"usersResponded"`
 }
 
 type ExperimentResult struct {

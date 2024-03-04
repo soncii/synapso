@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"sort"
 	"strconv"
 	"strings"
 	"synapso/logger"
@@ -34,6 +35,44 @@ func ListExperiments(ctx echo.Context) (result model.ExperimentList, err error) 
 		repo.Find(&data, "recognition_id = ?", recognition[i].Id)
 		result.Recognition = append(result.Recognition, recognition[i].ToDTO(data))
 	}
+	return
+}
+
+func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon, err error) {
+	repo := repository.GetRepository()
+	var recalls []model.Recall
+	err = repo.Find(&recalls).Error
+	if err != nil && !gorm.IsRecordNotFoundError(err) {
+		return
+	}
+	for i := 0; i < len(recalls); i++ {
+		var exp model.ExperimentCommon
+		exp.Id = recalls[i].ID
+		exp.Name = recalls[i].Name
+		exp.Type = "recall"
+		exp.DistractionType = recalls[i].DistractionType
+		exp.CreatedAt = recalls[i].CreatedAt
+		exp.StimulusType = recalls[i].Type
+		repo.Db.Model(&model.ExperimentResult{}).Where("recognition_id = ? AND type = ?", recalls[i].ID, "recall").Count(&exp.UsersResponded)
+		result = append(result, exp)
+	}
+
+	var recognition []model.Recognition
+	err = repo.Find(&recognition).Error
+	for i := 0; i < len(recognition); i++ {
+		var exp model.ExperimentCommon
+		exp.Id = recognition[i].Id
+		exp.Name = recognition[i].Name
+		exp.Type = "recognition"
+		exp.DistractionType = recognition[i].DistractionType
+		exp.CreatedAt = recognition[i].CreatedAt
+		exp.StimulusType = "recognition"
+		repo.Db.Model(&model.ExperimentResult{}).Where("recognition_id = ? AND type = ?", recognition[i].Id, "recognition").Count(&exp.UsersResponded)
+		result = append(result, exp)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Id < result[j].Id
+	})
 	return
 }
 

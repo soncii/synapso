@@ -19,6 +19,14 @@ func ListExperiments(ctx echo.Context) (err error) {
 	return ctx.JSON(200, experiments)
 }
 
+func GetUniformExperimentList(ctx echo.Context) (err error) {
+	experiments, err := service.GetUniformExperimentList(ctx)
+	if err != nil {
+		return ctx.JSON(500, err)
+	}
+	return ctx.JSON(200, experiments)
+}
+
 func SaveExperimentResult(ctx echo.Context) (err error) {
 	var recognitionResult model.ExperimentResultDTO
 	err = ctx.Bind(&recognitionResult)
