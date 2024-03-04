@@ -12,8 +12,22 @@ type CustomTime struct {
 	time.Time
 }
 
-func (ct *CustomTime) MarshalJSON() ([]byte, error) {
+func (ct CustomTime) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("\"%s\"", ct.Time.Format(layout))), nil
+}
+func (ct CustomTime) UnmarshalJSON(b []byte) error {
+	// Remove the quotes from the JSON string
+	s := string(b)
+	s = s[1 : len(s)-1] // slice off the quotes
+
+	// Parse the time string based on the custom format
+	t, err := time.Parse(layout, s)
+	if err != nil {
+		return err
+	}
+
+	ct.Time = t
+	return nil
 }
 
 type ExperimentList struct {
