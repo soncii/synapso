@@ -66,7 +66,7 @@ func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon
 		exp.Type = "recognition"
 		exp.DistractionType = recognition[i].DistractionType
 		exp.CreatedAt = recognition[i].CreatedAt
-		exp.StimulusType = "recognition"
+		exp.StimulusType = recognition[i].Type
 		repo.Db.Model(&model.ExperimentResult{}).Where("recognition_id = ? AND type = ?", recognition[i].Id, "recognition").Count(&exp.UsersResponded)
 		result = append(result, exp)
 	}
