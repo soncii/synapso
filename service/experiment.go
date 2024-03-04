@@ -39,6 +39,7 @@ func ListExperiments(ctx echo.Context) (result model.ExperimentList, err error) 
 }
 
 func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon, err error) {
+	result = make([]model.ExperimentCommon, 0)
 	repo := repository.GetRepository()
 	userId := middles.GetUserIDFromContext(ctx)
 	var recalls []model.Recall
