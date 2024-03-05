@@ -14,6 +14,7 @@ import (
 	"synapso/model"
 	"synapso/repository"
 	middles "synapso/transport/middleware"
+	"time"
 )
 
 func ListExperiments(ctx echo.Context) (result model.ExperimentList, err error) {
@@ -53,7 +54,7 @@ func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon
 		exp.Name = recalls[i].Name
 		exp.Type = "recall"
 		exp.DistractionType = recalls[i].DistractionType
-		exp.CreatedAt = model.CustomTime{Time: recalls[i].CreatedAt}
+		exp.CreatedAt = model.CustomTime{Time: recalls[i].CreatedAt.UTC().Add(time.Hour * 5)}
 		exp.StimulusType = recalls[i].Type
 		repo.Db.Model(&model.ExperimentResult{}).Where("recognition_id = ? AND type = ?", recalls[i].ID, "recall").Count(&exp.UsersResponded)
 		result = append(result, exp)
@@ -67,7 +68,7 @@ func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon
 		exp.Name = recognition[i].Name
 		exp.Type = "recognition"
 		exp.DistractionType = recognition[i].DistractionType
-		exp.CreatedAt = model.CustomTime{Time: recognition[i].CreatedAt}
+		exp.CreatedAt = model.CustomTime{Time: recognition[i].CreatedAt.UTC().Add(time.Hour * 5)}
 		exp.StimulusType = recognition[i].Type
 		repo.Db.Model(&model.ExperimentResult{}).Where("recognition_id = ? AND type = ?", recognition[i].Id, "recognition").Count(&exp.UsersResponded)
 		result = append(result, exp)

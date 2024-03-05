@@ -21,7 +21,7 @@ func (r RecallDTO) ToModel(userID int) Recall {
 	recall.ID = r.ID
 	recall.Name = r.Name
 	recall.UserID = userID
-	recall.CreatedAt = time.Now()
+	recall.CreatedAt = time.Now().UTC()
 	recall.InstructionText = r.InstructionText
 	recall.IsFreeRecall = r.IsFreeRecall
 	recall.Type = r.Stimulus.Type

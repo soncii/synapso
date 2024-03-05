@@ -20,7 +20,7 @@ func (r RecognitionDTO) ToModel(userID int) Recognition {
 	var recognition Recognition
 	recognition.Id = r.Id
 	recognition.Name = r.Name
-	recognition.CreatedAt = time.Now()
+	recognition.CreatedAt = time.Now().UTC()
 	recognition.UserId = userID
 	recognition.InstructionText = r.InstructionText
 	recognition.Type = r.Type
