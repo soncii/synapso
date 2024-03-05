@@ -54,6 +54,9 @@ func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon
 		exp.Name = recalls[i].Name
 		exp.Type = "recall"
 		exp.DistractionType = recalls[i].DistractionType
+		if exp.DistractionType == "" {
+			exp.DistractionType = "None"
+		}
 		exp.CreatedAt = model.CustomTime{Time: recalls[i].CreatedAt.UTC().Add(time.Hour * 5)}
 		exp.StimulusType = recalls[i].Type
 		repo.Db.Model(&model.ExperimentResult{}).Where("recognition_id = ? AND type = ?", recalls[i].ID, "recall").Count(&exp.UsersResponded)
@@ -68,6 +71,9 @@ func GetUniformExperimentList(ctx echo.Context) (result []model.ExperimentCommon
 		exp.Name = recognition[i].Name
 		exp.Type = "recognition"
 		exp.DistractionType = recognition[i].DistractionType
+		if exp.DistractionType == "" {
+			exp.DistractionType = "None"
+		}
 		exp.CreatedAt = model.CustomTime{Time: recognition[i].CreatedAt.UTC().Add(time.Hour * 5)}
 		exp.StimulusType = recognition[i].Type
 		repo.Db.Model(&model.ExperimentResult{}).Where("recognition_id = ? AND type = ?", recognition[i].Id, "recognition").Count(&exp.UsersResponded)
