@@ -73,11 +73,11 @@ type Stimulus struct {
 }
 
 type Stimuli struct {
-	ID       int    `json:"id"`
-	RecallID int    `json:"recallId"`
-	Data     string `json:"data"`
-	Delay    int    `json:"delay"`
-	Cue      string `json:"cue"`
+	ID       int     `json:"id"`
+	RecallID int     `json:"recallId"`
+	Data     string  `json:"data"`
+	Delay    int     `json:"delay"`
+	Cue      *string `json:"cue"`
 }
 
 type RecallResult struct {
