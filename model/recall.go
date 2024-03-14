@@ -32,8 +32,8 @@ func (r RecallDTO) ToModel(userID int) Recall {
 	recall.InterStimuliDelay = r.InterStimuliDelay
 	recall.IsDistractionEnabled = r.IsDistractionEnabled
 	recall.Stimuli = r.Stimulus.Stimuli
-	if recall.InstructionText == "" {
-		recall.InstructionText = "Please write the words you remember in the box below. Press start if you are ready to begin."
+	if recall.RecallInstructionText == "" {
+		recall.RecallInstructionText = "Please write the words you remember in the box below. Press start if you are ready to begin."
 	}
 	return recall
 }
