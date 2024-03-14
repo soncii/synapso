@@ -26,6 +26,7 @@ func (r RecallDTO) ToModel(userID int) Recall {
 	recall.InstructionText = r.InstructionText
 	recall.IsFreeRecall = r.IsFreeRecall
 	recall.Type = r.Stimulus.Type
+	recall.RecallInstructionText = r.RecallInstructionText
 	recall.DistractionDuration = r.DistractionDuration
 	recall.DistractionText = r.DistractionText
 	recall.DistractionType = r.DistractionType
