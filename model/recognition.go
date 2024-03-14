@@ -57,6 +57,7 @@ func (r Recognition) ToDTO(Data []RecognitionData) RecognitionDTO {
 	recognitionDTO.Id = r.Id
 	recognitionDTO.Name = r.Name
 	recognitionDTO.InstructionText = r.InstructionText
+	recognitionDTO.RecallInstructionText = r.RecallInstructionText
 	recognitionDTO.DistractionDuration = r.DistractionDuration
 	recognitionDTO.UserId = r.UserId
 	recognitionDTO.Type = r.Type
