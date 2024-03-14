@@ -3,17 +3,18 @@ package model
 import "time"
 
 type RecallDTO struct {
-	ID                   int      `json:"id"`
-	Name                 string   `json:"name"`
-	UserId               int      `json:"userId"`
-	InstructionText      string   `json:"instructionText"`
-	IsDistractionEnabled bool     `json:"isDistractionEnabled"`
-	DistractionType      string   `json:"distractionType"`
-	DistractionText      string   `json:"distractionText"`
-	DistractionDuration  int      `json:"distractionDuration"`
-	InterStimuliDelay    int      `json:"interStimuliDelay"`
-	IsFreeRecall         bool     `json:"isFreeRecall"`
-	Stimulus             Stimulus `json:"stimulus"`
+	ID                    int      `json:"id"`
+	Name                  string   `json:"name"`
+	UserId                int      `json:"userId"`
+	InstructionText       string   `json:"instructionText"`
+	RecallInstructionText string   `json:"recallInstructionText"`
+	IsDistractionEnabled  bool     `json:"isDistractionEnabled"`
+	DistractionType       string   `json:"distractionType"`
+	DistractionText       string   `json:"distractionText"`
+	DistractionDuration   int      `json:"distractionDuration"`
+	InterStimuliDelay     int      `json:"interStimuliDelay"`
+	IsFreeRecall          bool     `json:"isFreeRecall"`
+	Stimulus              Stimulus `json:"stimulus"`
 }
 
 func (r RecallDTO) ToModel(userID int) Recall {
@@ -31,6 +32,9 @@ func (r RecallDTO) ToModel(userID int) Recall {
 	recall.InterStimuliDelay = r.InterStimuliDelay
 	recall.IsDistractionEnabled = r.IsDistractionEnabled
 	recall.Stimuli = r.Stimulus.Stimuli
+	if recall.InstructionText == "" {
+		recall.InstructionText = "Please write the words you remember in the box below. Press start if you are ready to begin."
+	}
 	return recall
 }
 
@@ -38,6 +42,7 @@ func (r Recall) ToDTO() RecallDTO {
 	var recallDTO RecallDTO
 	recallDTO.ID = r.ID
 	recallDTO.Name = r.Name
+	recallDTO.RecallInstructionText = r.RecallInstructionText
 	recallDTO.InstructionText = r.InstructionText
 	recallDTO.UserId = r.UserID
 	recallDTO.IsFreeRecall = r.IsFreeRecall
@@ -52,19 +57,20 @@ func (r Recall) ToDTO() RecallDTO {
 }
 
 type Recall struct {
-	ID                   int       `json:"id"`
-	Name                 string    `json:"name"`
-	UserID               int       `json:"userId"`
-	CreatedAt            time.Time `json:"createdAt"`
-	Type                 string    `json:"type"`
-	InstructionText      string    `json:"instructionText"`
-	Stimuli              []Stimuli `json:"stimulus" gorm:"-"`
-	IsDistractionEnabled bool      `json:"isDistractionEnabled"`
-	DistractionType      string    `json:"distractionType"`
-	DistractionText      string    `json:"distractionText"`
-	DistractionDuration  int       `json:"distractionDuration"`
-	InterStimuliDelay    int       `json:"interStimuliDelay"`
-	IsFreeRecall         bool      `json:"isFreeRecall"`
+	ID                    int       `json:"id"`
+	Name                  string    `json:"name"`
+	UserID                int       `json:"userId"`
+	CreatedAt             time.Time `json:"createdAt"`
+	Type                  string    `json:"type"`
+	InstructionText       string    `json:"instructionText"`
+	RecallInstructionText string    `json:"recallInstructionText"`
+	Stimuli               []Stimuli `json:"stimulus" gorm:"-"`
+	IsDistractionEnabled  bool      `json:"isDistractionEnabled"`
+	DistractionType       string    `json:"distractionType"`
+	DistractionText       string    `json:"distractionText"`
+	DistractionDuration   int       `json:"distractionDuration"`
+	InterStimuliDelay     int       `json:"interStimuliDelay"`
+	IsFreeRecall          bool      `json:"isFreeRecall"`
 }
 
 type Stimulus struct {

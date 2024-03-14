@@ -3,17 +3,18 @@ package model
 import "time"
 
 type RecognitionDTO struct {
-	Id                   int               `json:"id"`
-	Name                 string            `json:"name"`
-	UserId               int               `json:"userId"`
-	Type                 string            `json:"type"`
-	InstructionText      string            `json:"instructionText"`
-	IsDistractionEnabled bool              `json:"isDistractionEnabled"`
-	DistractionType      string            `json:"distractionType"`
-	DistractionText      string            `json:"distractionText"`
-	DistractionDuration  int               `json:"distractionDuration"`
-	InterStimuliDelay    int               `json:"interStimuliDelay"`
-	Data                 []RecognitionData `gorm:"-" json:"data"`
+	Id                    int               `json:"id"`
+	Name                  string            `json:"name"`
+	UserId                int               `json:"userId"`
+	Type                  string            `json:"type"`
+	InstructionText       string            `json:"instructionText"`
+	RecallInstructionText string            `json:"recallInstructionText"`
+	IsDistractionEnabled  bool              `json:"isDistractionEnabled"`
+	DistractionType       string            `json:"distractionType"`
+	DistractionText       string            `json:"distractionText"`
+	DistractionDuration   int               `json:"distractionDuration"`
+	InterStimuliDelay     int               `json:"interStimuliDelay"`
+	Data                  []RecognitionData `gorm:"-" json:"data"`
 }
 
 func (r RecognitionDTO) ToModel(userID int) Recognition {
@@ -22,6 +23,7 @@ func (r RecognitionDTO) ToModel(userID int) Recognition {
 	recognition.Name = r.Name
 	recognition.CreatedAt = time.Now().UTC()
 	recognition.UserId = userID
+	recognition.RecallInstructionText = r.RecallInstructionText
 	recognition.InstructionText = r.InstructionText
 	recognition.Type = r.Type
 	recognition.InterStimuliDelay = r.InterStimuliDelay
@@ -29,21 +31,25 @@ func (r RecognitionDTO) ToModel(userID int) Recognition {
 	recognition.DistractionType = r.DistractionType
 	recognition.DistractionDuration = r.DistractionDuration
 	recognition.DistractionText = r.DistractionText
+	if recognition.RecallInstructionText == "" {
+		recognition.RecallInstructionText = "Please choose one word that you have seen before. Press start if you are ready to begin."
+	}
 	return recognition
 }
 
 type Recognition struct {
-	Id                   int       `json:"id"`
-	UserId               int       `json:"userId"`
-	CreatedAt            time.Time `json:"createdAt"`
-	Name                 string    `json:"name"`
-	InstructionText      string    `json:"instructionText"`
-	Type                 string    `json:"type"`
-	InterStimuliDelay    int       `json:"interStimuliDelay"`
-	IsDistractionEnabled bool      `json:"isDistractionEnabled"`
-	DistractionDuration  int       `json:"distractionDuration"`
-	DistractionType      string    `json:"distractionType"`
-	DistractionText      string    `json:"distractionText"`
+	Id                    int       `json:"id"`
+	UserId                int       `json:"userId"`
+	CreatedAt             time.Time `json:"createdAt"`
+	Name                  string    `json:"name"`
+	InstructionText       string    `json:"instructionText"`
+	RecallInstructionText string    `json:"recallInstructionText"`
+	Type                  string    `json:"type"`
+	InterStimuliDelay     int       `json:"interStimuliDelay"`
+	IsDistractionEnabled  bool      `json:"isDistractionEnabled"`
+	DistractionDuration   int       `json:"distractionDuration"`
+	DistractionType       string    `json:"distractionType"`
+	DistractionText       string    `json:"distractionText"`
 }
 
 func (r Recognition) ToDTO(Data []RecognitionData) RecognitionDTO {
